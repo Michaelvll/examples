@@ -75,6 +75,7 @@ parser.add_argument('--multiprocessing-distributed', action='store_true',
                          'N processes per node, which has N GPUs. This is the '
                          'fastest way to use PyTorch for either single node or '
                          'multi node data parallel training')
+parser.add_argument('--save-path', default='.', type=str, metavar='PATH')
 
 best_acc1 = 0
 
@@ -268,7 +269,7 @@ def main_worker(gpu, ngpus_per_node, args):
                 'best_acc1': best_acc1,
                 'optimizer' : optimizer.state_dict(),
                 'scheduler' : scheduler.state_dict()
-            }, is_best)
+            }, is_best, save_path=args.save_path)
 
 
 def train(train_loader, model, criterion, optimizer, epoch, args):
@@ -361,10 +362,12 @@ def validate(val_loader, model, criterion, args):
     return top1.avg
 
 
-def save_checkpoint(state, is_best, filename='checkpoint.pth.tar'):
-    torch.save(state, filename)
+def save_checkpoint(state, is_best, filename='checkpoint.pth.tar', save_path='.'):
+    file_path = os.path.join(save_path, filename)
+    torch.save(state, file_path)
     if is_best:
-        shutil.copyfile(filename, 'model_best.pth.tar')
+        best_path = os.path.join(save_path, 'model_best.pth.tar')
+        shutil.copyfile(filename, best_path)
 
 class Summary(Enum):
     NONE = 0
