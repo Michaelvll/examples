@@ -321,7 +321,8 @@ def train(train_loader, model, criterion, optimizer, epoch, args):
 
         if i % args.print_freq == 0:
             progress.display(i)
-    wandb.log({'train/batch_time': batch_time.avg,
+    wandb.log({'epoch': epoch, 
+               'train/batch_time': batch_time.avg,
                'train/data_time': data_time.avg,
                'train/loss': losses.avg,
                'train/acc1': top1.avg,
